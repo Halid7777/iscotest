@@ -1,7 +1,7 @@
 // ========== APP STATE ==========
 const state = {
   screen: 'home',        // 'home' | 'setup' | 'quiz' | 'results'
-  section: 'km1',
+  section: 'v1',
   questionCount: 20,
   timeLimit: 30,
   questions: [],
@@ -12,6 +12,16 @@ const state = {
   totalTime: 0,
   startTime: null,
 };
+
+const SECTION_NAMES = {
+  v1: '📋 Вариант 1',
+  v2: '📋 Вариант 2',
+  v3: '📋 Вариант 3',
+  v4: '📋 Вариант 4',
+  all: '🎯 Все варианты'
+};
+
+const SECTION_COUNTS = { v1: 25, v2: 25, v3: 25, v4: 25, all: 100 };
 
 // ========== RENDER ENGINE ==========
 function render() {
@@ -33,40 +43,40 @@ function renderHome() {
     <div class="home-content">
       <div class="home-badge">📋 Квалификационный тест</div>
       <h1 class="home-title">КвалТест</h1>
-      <p class="home-sub">Выберите раздел для прохождения теста.</p>
+      <p class="home-sub">Выберите вариант для прохождения теста.</p>
       <div class="section-cards">
-        <div class="section-card km1" onclick="selectSectionAndStart('km1')">
-          <div class="sc-icon">🦺</div>
-          <div class="sc-name">КМ 1</div>
-          <div class="sc-desc">Охрана труда и безопасность</div>
+        <div class="section-card v1" onclick="selectSectionAndStart('v1')">
+          <div class="sc-icon">1️⃣</div>
+          <div class="sc-name">Вариант 1</div>
+          <div class="sc-desc">Охрана труда, арматура, бетон</div>
           <div class="sc-count">25 вопросов</div>
         </div>
-        <div class="section-card km2" onclick="selectSectionAndStart('km2')">
-          <div class="sc-icon">🏗️</div>
-          <div class="sc-name">КМ 2</div>
-          <div class="sc-desc">Арматурные и опалубочные работы</div>
+        <div class="section-card v2" onclick="selectSectionAndStart('v2')">
+          <div class="sc-icon">2️⃣</div>
+          <div class="sc-name">Вариант 2</div>
+          <div class="sc-desc">Безопасность, каменные работы</div>
           <div class="sc-count">25 вопросов</div>
         </div>
-        <div class="section-card km3" onclick="selectSectionAndStart('km3')">
-          <div class="sc-icon">🧱</div>
-          <div class="sc-name">КМ 3</div>
-          <div class="sc-desc">Каменные работы</div>
+        <div class="section-card v3" onclick="selectSectionAndStart('v3')">
+          <div class="sc-icon">3️⃣</div>
+          <div class="sc-name">Вариант 3</div>
+          <div class="sc-desc">Охрана труда, бетонные работы</div>
           <div class="sc-count">25 вопросов</div>
         </div>
-        <div class="section-card km4" onclick="selectSectionAndStart('km4')">
-          <div class="sc-icon">🪨</div>
-          <div class="sc-name">КМ 4</div>
-          <div class="sc-desc">Бетонные работы и стяжки</div>
-          <div class="sc-count">24 вопроса</div>
+        <div class="section-card v4" onclick="selectSectionAndStart('v4')">
+          <div class="sc-icon">4️⃣</div>
+          <div class="sc-name">Вариант 4</div>
+          <div class="sc-desc">Освещённость, безопасность, бетон</div>
+          <div class="sc-count">25 вопросов</div>
         </div>
         <div class="section-card all" onclick="selectSectionAndStart('all')">
           <div class="sc-icon">🎯</div>
-          <div class="sc-name">Все разделы</div>
-          <div class="sc-desc">Вопросы из всех КМ</div>
-          <div class="sc-count">99 вопросов</div>
+          <div class="sc-name">Все варианты</div>
+          <div class="sc-desc">Вопросы из всех вариантов</div>
+          <div class="sc-count">100 вопросов</div>
         </div>
       </div>
-      <p class="home-hint">Нажмите на раздел, чтобы начать</p>
+      <p class="home-hint">Нажмите на вариант, чтобы начать</p>
     </div>
   `;
   return el;
@@ -75,25 +85,21 @@ function renderHome() {
 function selectSectionAndStart(section) {
   state.section = section;
   state.screen = 'setup';
+  // Reset question count to a sensible default for the chosen section
+  const max = SECTION_COUNTS[section];
+  state.questionCount = Math.min(state.questionCount, max);
   render();
 }
 
 // ========== SETUP SCREEN ==========
 function renderSetup() {
-  const sectionNames = {
-    km1: '🦺 КМ 1',
-    km2: '🏗️ КМ 2',
-    km3: '🧱 КМ 3',
-    km4: '🪨 КМ 4',
-    all: '🎯 Все разделы'
-  };
-  const maxQ = state.section === 'km4' ? 24 : state.section === 'all' ? 99 : 25;
+  const maxQ = SECTION_COUNTS[state.section];
 
   const el = createElement('div', 'screen setup-screen');
   el.innerHTML = `
     <button class="back-btn" onclick="goHome()">← Назад</button>
     <div class="setup-content">
-      <div class="setup-section-badge ${state.section}">${sectionNames[state.section]}</div>
+      <div class="setup-section-badge ${state.section}">${SECTION_NAMES[state.section]}</div>
       <h2 class="setup-title">Настройка теста</h2>
 
       <div class="setup-section">
@@ -137,7 +143,7 @@ function renderSetup() {
       </div>
 
       <div class="setup-summary">
-        <div class="sum-item"><span>Раздел</span><strong>${sectionNames[state.section]}</strong></div>
+        <div class="sum-item"><span>Вариант</span><strong>${SECTION_NAMES[state.section]}</strong></div>
         <div class="sum-item"><span>Вопросов</span><strong id="sumCount">${state.questionCount}</strong></div>
         <div class="sum-item"><span>Время</span><strong id="sumTime">${state.timeLimit === 0 ? '∞' : state.timeLimit + ' сек'}</strong></div>
         <div class="sum-item"><span>~Итого</span><strong id="sumTotal">${state.timeLimit === 0 ? '—' : formatTime(state.timeLimit * state.questionCount)}</strong></div>
@@ -204,14 +210,13 @@ function startQuiz() {
 function renderQuiz() {
   const q = state.questions[state.currentIndex];
   const progress = ((state.currentIndex) / state.questions.length) * 100;
-  const sectionNames = { km1: '🦺 КМ 1', km2: '🏗️ КМ 2', km3: '🧱 КМ 3', km4: '🪨 КМ 4', all: '🎯 Все' };
   const sectionClass = q.section || state.section;
 
   const el = createElement('div', 'screen quiz-screen');
   el.innerHTML = `
     <div class="quiz-header">
       <div class="quiz-meta">
-        <span class="q-section-tag ${sectionClass}">${sectionNames[sectionClass] || sectionClass}</span>
+        <span class="q-section-tag ${sectionClass}">${SECTION_NAMES[sectionClass] || sectionClass}</span>
         <span class="q-counter">${state.currentIndex + 1} / ${state.questions.length}</span>
       </div>
       <div class="progress-bar">
